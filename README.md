@@ -12,4 +12,8 @@ Background
 - https://developer.android.com/reference/android/content/Intent
 - https://developer.android.com/develop/background-work/services/alarms/schedule
 
-Isaac - current working on background collections of wifi data to sql database 
+- [] Wifi Data Collection
+- [] Cellular Data Collection
+- [] SQL lite connection
+- [] Location Collection
+- [] Button to start and stop 
