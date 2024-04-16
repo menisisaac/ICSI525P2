@@ -8,9 +8,8 @@ public class WifiBroadcast extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0) {
+        WifiIntent wifiIntent = new WifiIntent();
 
-        }
     };
 
 }
