@@ -25,17 +25,16 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
-    public void startDataCollection() {
+    public void startDataCollection(View v) {
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        Intent intent = new Intent(this, WifiBroadcast.class);
+        Context c = this.getApplicationContext();
+        Intent intent = new Intent(this.getApplicationContext(), WifiBroadcast.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 0, intent, 0);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000, pendingIntent);
     }
     @Override
     protected void onCreate(Bundle savedState) {
         super.onCreate(savedState);
-        WifiTable wt = new WifiTable();
-        startDataCollection();
         setContentView(R.layout.main);
     }
 

@@ -31,17 +31,17 @@ public final class WifiTable {
         private static final String CREATE_SCAN_TABLE = "create table " + SCANTABLE_NAME + "("
                 + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + timestamp + " TEXT NOT NULL, "
                 + longitude + " TEXT NOT NULL, " + latitude + " TEXT NOT NULL);";
-        private static final String CREATE_TABLE = "create table " + WIFI_TABLE_NAME + "(" + _ID
+        /*= "create table " + WIFI_TABLE_NAME + "(" + _ID
                 + " INTEGER PRIMARY KEY AUTOINCREMENT, " + bssid + " TEXT NOT NULL, "
                 + ssid + " TEXT NOT NULL, " + frequency + " INTEGER, " + channel_width + " INTEGER, "
                 + rssi_level + " INTEGER, "
                 + scan_id + "INTEGER, "
                 + " FOREIGN KEY ("+scan_id+") REFERENCES "+SCANTABLE_NAME+"("+_ID+"));";
-
+*/
         @Override
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(CREATE_SCAN_TABLE);
-            db.execSQL(CREATE_TABLE);
+            //db.execSQL(CREATE_TABLE);
         }
 
         @Override

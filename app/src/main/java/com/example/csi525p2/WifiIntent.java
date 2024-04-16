@@ -1,23 +1,27 @@
 package com.example.csi525p2;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
 public class WifiIntent extends IntentService {
-
+    WifiManager wifi;
     public WifiIntent() {
         super("WifiCollection");
+        Log.d("Creation", "WifiIntent Is Trying to Start");
     }
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        WifiManager wifi = (WifiManager) getSystemService(WifiManager.class);
+        Log.d("Error", "Intent Happened");
+        WifiManager wifi = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider
             //    ActivityCompat#requestPermissions
@@ -29,7 +33,7 @@ public class WifiIntent extends IntentService {
             return;
         }
         for(ScanResult scanResult : wifi.getScanResults()) {
-            System.out.println(scanResult);
+            Log.d("Creation", scanResult.BSSID);
         }
     }
 }
