@@ -15,25 +15,10 @@ public class WifiIntent extends IntentService {
     WifiManager wifi;
     public WifiIntent() {
         super("WifiCollection");
-        Log.d("Creation", "WifiIntent Is Trying to Start");
     }
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        Log.d("Error", "Intent Happened");
-        WifiManager wifi = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details;
-            return;
-        }
-        for(ScanResult scanResult : wifi.getScanResults()) {
-            Log.d("Creation", scanResult.BSSID);
-        }
+        Log.d("Event", "Wifi Intent Sent");
     }
 }

@@ -32,6 +32,5 @@ public final class WifiTable {
                 + WifiEntry.bssid + " TEXT NOT NULL, " + WifiEntry.ssid + " TEXT NOT NULL, "
                 + WifiEntry.frequency + " INTEGER, " + WifiEntry.channel_width + " INTEGER, "
                 + WifiEntry.rssi_level + " INTEGER)";
-
     }
 }

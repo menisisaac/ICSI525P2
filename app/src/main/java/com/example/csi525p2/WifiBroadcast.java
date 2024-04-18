@@ -30,7 +30,7 @@ public class WifiBroadcast extends BroadcastReceiver {
     ;
 
     protected void on(Context context) {
-        Log.d("Error", "Intent Happened");
+        Log.d("Event", "Intent Happened");
         WifiManager wifi = (WifiManager) context.getSystemService(WIFI_SERVICE);
         LocationManager lm = (LocationManager) context.getSystemService(LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
