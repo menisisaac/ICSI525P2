@@ -6,8 +6,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.telephony.CellIdentityGsm;
 import android.telephony.CellIdentityLte;
 import android.telephony.CellIdentityNr;
@@ -29,6 +30,12 @@ import androidx.core.content.ContextCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+
 import java.util.List;
 
 /**
@@ -39,14 +46,14 @@ public class CellularWorker extends Worker {
     // TelephonyManager instance to access cellular network information
     private final TelephonyManager telephonyManager;
 
-    // LocationManager instance to access location information
-    private final LocationManager locationManager;
-
     // Database helper instance for database operations
     private final CellularDBHelper dbHelper;
 
     // Context of the application
     private final Context context;
+
+    // FusedLocationProviderClient for accessing device location
+    private final FusedLocationProviderClient fusedLocationClient;
 
     /**
      * Constructor for CellularWorker class.
@@ -58,7 +65,7 @@ public class CellularWorker extends Worker {
         super(context, workerParams);
         this.context = context;
         this.telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        this.locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        this.fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
         this.dbHelper = new CellularDBHelper(context);
     }
 
@@ -84,78 +91,91 @@ public class CellularWorker extends Worker {
             return Result.failure();
         }
 
-        // Check for permission to access fine location
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.e("CellularWorker", "Permission ACCESS_FINE_LOCATION not granted.");
-            return Result.failure();
-        }
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
 
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        // Get the list of CellInfo objects representing the available cellular networks
-        if (location != null) {
-            Log.i("CellularWorker", "Location found: " + location.getLatitude() + ", " + location.getLongitude());
-        List<CellInfo> cellInfoList = telephonyManager.getAllCellInfo();
-        if (cellInfoList != null) {
-            for (CellInfo cellInfo : cellInfoList) {
-                if (cellInfo instanceof CellInfoGsm) {
-                    // Retrieve GSM cell information and save to database
-                    CellInfoGsm cellInfoGsm = (CellInfoGsm) cellInfo;
-                    CellIdentityGsm cellIdentity = cellInfoGsm.getCellIdentity();
-                    CellSignalStrengthGsm cellSignalStrength = cellInfoGsm.getCellSignalStrength();
-
-                    long cellId = cellIdentity.getCid();
-                    int rssi = cellSignalStrength.getDbm();
-                    String technology = "2G";
-                    int frequency = cellIdentity.getArfcn();
-
-                    saveDataToDatabase(location, cellId, rssi, technology, frequency);
-
-                } else if (cellInfo instanceof CellInfoWcdma) {
-                    // Retrieve WCDMA cell information and save to database
-                    CellInfoWcdma cellInfoWcdma = (CellInfoWcdma) cellInfo;
-                    CellIdentityWcdma cellIdentity = cellInfoWcdma.getCellIdentity();
-                    CellSignalStrengthWcdma cellSignalStrength = cellInfoWcdma.getCellSignalStrength();
-
-                    long cellId = cellIdentity.getCid();
-                    int rssi = cellSignalStrength.getDbm();
-                    String technology = "3G";
-                    int frequency = cellIdentity.getUarfcn();
-
-                    saveDataToDatabase(location, cellId, rssi, technology, frequency);
-
-                } else if (cellInfo instanceof CellInfoLte) {
-                    // Retrieve LTE cell information and save to database
-                    CellInfoLte cellInfoLte = (CellInfoLte) cellInfo;
-                    CellIdentityLte cellIdentity = cellInfoLte.getCellIdentity();
-                    CellSignalStrengthLte cellSignalStrength = cellInfoLte.getCellSignalStrength();
-
-                    long cellId = cellIdentity.getCi();
-                    int rssi = cellSignalStrength.getDbm();
-                    String technology = "4G";
-                    int frequency = cellIdentity.getEarfcn();
-
-                    saveDataToDatabase(location, cellId, rssi, technology, frequency);
-
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && cellInfo instanceof CellInfoNr) { // Handle NR cell info
-                    // Retrieve NR cell information and save to database
-                    CellInfoNr cellInfoNr = (CellInfoNr) cellInfo;
-                    CellIdentityNr cellIdentity = (CellIdentityNr) cellInfoNr.getCellIdentity();
-                    CellSignalStrengthNr cellSignalStrength = (CellSignalStrengthNr) cellInfoNr.getCellSignalStrength();
-
-                    long cellId = cellIdentity.getNci();
-                    int rssi = cellSignalStrength.getDbm();
-                    String technology = "5G";
-                    int frequency = cellIdentity.getNrarfcn();
-
-                    saveDataToDatabase(location, cellId, rssi, technology, frequency);
+                // Check for permission to access fine location
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    Log.e("CellularWorker", "Permission ACCESS_FINE_LOCATION not granted.");
+                    return;
                 }
-            }
-        }
-        } else {
-            Log.e("CellularWorker", "Location is null");
-        }
+                fusedLocationClient.requestLocationUpdates(LocationRequest.create(), new LocationCallback() {
+                    @Override
+                    public void onLocationResult(@NonNull LocationResult locationResult) {
+                        if (locationResult.getLastLocation() != null) {
+                            Location location = locationResult.getLastLocation();
 
-        dbHelper.close();
+                            // Check for permission to access fine location
+                            if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                Log.e("CellularWorker", "Permission ACCESS_FINE_LOCATION not granted.");
+                                return;
+                            }
+
+                            List<CellInfo> cellInfoList = telephonyManager.getAllCellInfo();
+                            if (cellInfoList != null) {
+                                for (CellInfo cellInfo : cellInfoList) {
+                                    if (cellInfo instanceof CellInfoGsm) {
+                                        // Retrieve GSM cell information and save to database
+                                        CellInfoGsm cellInfoGsm = (CellInfoGsm) cellInfo;
+                                        CellIdentityGsm cellIdentity = cellInfoGsm.getCellIdentity();
+                                        CellSignalStrengthGsm cellSignalStrength = cellInfoGsm.getCellSignalStrength();
+
+                                        long cellId = cellIdentity.getCid();
+                                        int rssi = cellSignalStrength.getDbm();
+                                        String technology = "2G";
+                                        int frequency = cellIdentity.getArfcn();
+
+                                        saveDataToDatabase(location, cellId, rssi, technology, frequency);
+
+                                    } else if (cellInfo instanceof CellInfoWcdma) {
+                                        // Retrieve WCDMA cell information and save to database
+                                        CellInfoWcdma cellInfoWcdma = (CellInfoWcdma) cellInfo;
+                                        CellIdentityWcdma cellIdentity = cellInfoWcdma.getCellIdentity();
+                                        CellSignalStrengthWcdma cellSignalStrength = cellInfoWcdma.getCellSignalStrength();
+
+                                        long cellId = cellIdentity.getCid();
+                                        int rssi = cellSignalStrength.getDbm();
+                                        String technology = "3G";
+                                        int frequency = cellIdentity.getUarfcn();
+
+                                        saveDataToDatabase(location, cellId, rssi, technology, frequency);
+
+                                    } else if (cellInfo instanceof CellInfoLte) {
+                                        // Retrieve LTE cell information and save to database
+                                        CellInfoLte cellInfoLte = (CellInfoLte) cellInfo;
+                                        CellIdentityLte cellIdentity = cellInfoLte.getCellIdentity();
+                                        CellSignalStrengthLte cellSignalStrength = cellInfoLte.getCellSignalStrength();
+
+                                        long cellId = cellIdentity.getCi();
+                                        int rssi = cellSignalStrength.getDbm();
+                                        String technology = "4G";
+                                        int frequency = cellIdentity.getEarfcn();
+
+                                        saveDataToDatabase(location, cellId, rssi, technology, frequency);
+
+                                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && cellInfo instanceof CellInfoNr) {
+                                        // Retrieve NR cell information and save to database
+                                        CellInfoNr cellInfoNr = (CellInfoNr) cellInfo;
+                                        CellIdentityNr cellIdentity = (CellIdentityNr) cellInfoNr.getCellIdentity();
+                                        CellSignalStrengthNr cellSignalStrength = (CellSignalStrengthNr) cellInfoNr.getCellSignalStrength();
+
+                                        long cellId = cellIdentity.getNci();
+                                        int rssi = cellSignalStrength.getDbm();
+                                        String technology = "5G";
+                                        int frequency = cellIdentity.getNrarfcn();
+
+                                        saveDataToDatabase(location, cellId, rssi, technology, frequency);
+                                    }
+                                }
+                            }
+                        } else {
+                            Log.e("CellularWorker", "Current location is null");
+                        }
+                    }
+                }, null);
+            }
+        });
 
         // Indicate successful completion of work
         return Result.success();
@@ -170,22 +190,29 @@ public class CellularWorker extends Worker {
      * @param frequency  The frequency of the network.
      */
     private void saveDataToDatabase(Location location, long cellId, int rssi, String technology, int frequency) {
-        // Get writable database instance
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        if (location != null) {
+            // Get current timestamp
+            long timestamp = System.currentTimeMillis();
 
-        // Insert data into the database table
-        db.execSQL("INSERT INTO cellular_data (timestamp, latitude, longitude, cell_id, rssi, technology, frequency) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                new Object[]{location.getTime(), location.getLatitude(), location.getLongitude(), cellId, rssi, technology, frequency});
+            // Get writable database instance
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        // Log the inserted data for debugging or tracking purposes
-        Log.d("CellularIntentService",
-                "timestamp: " + location.getTime() +
-                        " latitude: " + location.getLatitude() +
-                        " longitude: " + location.getLongitude() +
-                        " cellId: " + cellId +
-                        " rssi: " + rssi +
-                        " technology: " + technology +
-                        " frequency: " + frequency);
+            // Insert data into the database table
+            db.execSQL("INSERT INTO cellular_data (timestamp, latitude, longitude, cell_id, rssi, technology, frequency) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    new Object[]{timestamp, location.getLatitude(), location.getLongitude(), cellId, rssi, technology, frequency});
+
+            // Log the inserted data for debugging or tracking purposes
+            Log.d("CellularWorker",
+                    "timestamp: " + timestamp +
+                            " latitude: " + location.getLatitude() +
+                            " longitude: " + location.getLongitude() +
+                            " cellId: " + cellId +
+                            " rssi: " + rssi +
+                            " technology: " + technology +
+                            " frequency: " + frequency);
+        } else {
+            Log.e("CellularWorker", "Location is null");
+        }
     }
 
     // Enqueue work method

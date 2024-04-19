@@ -42,6 +42,17 @@ public class CellularDBHelper extends SQLiteOpenHelper {
                 "frequency INTEGER)");
     }
 
+//    @Override
+//    public void onCreate(SQLiteDatabase db) {
+//        // Create the 'cellular_data' table if it doesn't exist
+//        db.execSQL("CREATE TABLE IF NOT EXISTS cellular_data (" +
+//                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+//                "cell_id INTEGER, " +
+//                "rssi INTEGER, " +
+//                "technology TEXT, " +
+//                "frequency INTEGER)");
+//    }
+
     /**
      * Called when the database needs to be upgraded.
      *

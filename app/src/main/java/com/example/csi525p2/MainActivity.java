@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.View;
 
 /**
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
      * @param v The View object that triggered the method call.
      */
     public void startWifiCollection(View v) {
+        Log.i("MainActivity", "Wifi scan started");
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent intent = new Intent(this.getApplicationContext(), WifiBroadcast.class);
         pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 0, intent, 0);
@@ -60,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
      * @param v The View object that triggered the method call.
      */
     public void startCellularIntentService(View v) {
+        Log.i("MainActivity", "Cellular scan started");
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         if (checkPermissions()) {
             Intent intent = new Intent(this, CellularBroadcastReceiver.class);
@@ -76,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
      * @param v The View object that triggered the method call.
      */
     public void endWifiCollection(View v) {
+        Log.i("MainActivity", "Wifi scan stopped");
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent intent = new Intent(this, WifiBroadcast.class);
         pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 0, intent, 0);
@@ -87,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
      * @param v The View object that triggered the method call.
      */
     public void stopCellularIntentService(View v) {
+        Log.i("MainActivity", "Wifi scan stopped");
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent intent = new Intent(this, CellularBroadcastReceiver.class);
         pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 0, intent, PendingIntent.FLAG_IMMUTABLE);
