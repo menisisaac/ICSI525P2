@@ -47,9 +47,9 @@
         <!-- Broadcast receivers -->
         <receiver android:name=".WifiBroadcast"
             android:exported="false">
-            <intent-filter>
-                <action android:name="android.net.wifi.SCAN_RESULTS" />
-            </intent-filter>
+<!--            <intent-filter>-->
+<!--                <action android:name="android.net.wifi.SCAN_RESULTS" />-->
+<!--            </intent-filter>-->
         </receiver>
         <receiver android:name=".CellularBroadcastReceiver"
             android:exported="false">

@@ -1,3 +1,5 @@
+
+
 package com.example.csi525p2;
 
 import android.Manifest;
@@ -90,10 +92,7 @@ public class CellularWorker extends Worker {
             return Result.failure();
         }
 
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         // Get the list of CellInfo objects representing the available cellular networks
-        if (location != null) {
-            Log.i("CellularWorker", "Location found: " + location.getLatitude() + ", " + location.getLongitude());
         List<CellInfo> cellInfoList = telephonyManager.getAllCellInfo();
         if (cellInfoList != null) {
             for (CellInfo cellInfo : cellInfoList) {
@@ -102,6 +101,7 @@ public class CellularWorker extends Worker {
                     CellInfoGsm cellInfoGsm = (CellInfoGsm) cellInfo;
                     CellIdentityGsm cellIdentity = cellInfoGsm.getCellIdentity();
                     CellSignalStrengthGsm cellSignalStrength = cellInfoGsm.getCellSignalStrength();
+                    Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
                     long cellId = cellIdentity.getCid();
                     int rssi = cellSignalStrength.getDbm();
@@ -120,6 +120,7 @@ public class CellularWorker extends Worker {
                     int rssi = cellSignalStrength.getDbm();
                     String technology = "3G";
                     int frequency = cellIdentity.getUarfcn();
+                    Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
                     saveDataToDatabase(location, cellId, rssi, technology, frequency);
 
@@ -133,6 +134,7 @@ public class CellularWorker extends Worker {
                     int rssi = cellSignalStrength.getDbm();
                     String technology = "4G";
                     int frequency = cellIdentity.getEarfcn();
+                    Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
                     saveDataToDatabase(location, cellId, rssi, technology, frequency);
 
@@ -146,16 +148,12 @@ public class CellularWorker extends Worker {
                     int rssi = cellSignalStrength.getDbm();
                     String technology = "5G";
                     int frequency = cellIdentity.getNrarfcn();
+                    Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
                     saveDataToDatabase(location, cellId, rssi, technology, frequency);
                 }
             }
         }
-        } else {
-            Log.e("CellularWorker", "Location is null");
-        }
-
-        dbHelper.close();
 
         // Indicate successful completion of work
         return Result.success();
@@ -169,24 +167,36 @@ public class CellularWorker extends Worker {
      * @param technology The technology (2G, 3G, 4G, 5G) of the network.
      * @param frequency  The frequency of the network.
      */
+
+
+
     private void saveDataToDatabase(Location location, long cellId, int rssi, String technology, int frequency) {
-        // Get writable database instance
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        if (location != null) {
+            // Get current timestamp
+            long timestamp = System.currentTimeMillis();
 
-        // Insert data into the database table
-        db.execSQL("INSERT INTO cellular_data (timestamp, latitude, longitude, cell_id, rssi, technology, frequency) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                new Object[]{location.getTime(), location.getLatitude(), location.getLongitude(), cellId, rssi, technology, frequency});
+            // Get writable database instance
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        // Log the inserted data for debugging or tracking purposes
-        Log.d("CellularIntentService",
-                "timestamp: " + location.getTime() +
-                        " latitude: " + location.getLatitude() +
-                        " longitude: " + location.getLongitude() +
-                        " cellId: " + cellId +
-                        " rssi: " + rssi +
-                        " technology: " + technology +
-                        " frequency: " + frequency);
+            // Insert data into the database table
+            db.execSQL("INSERT INTO cellular_data (timestamp, latitude, longitude, cell_id, rssi, technology, frequency) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    new Object[]{timestamp, location.getLatitude(), location.getLongitude(), cellId, rssi, technology, frequency});
+
+            // Log the inserted data for debugging or tracking purposes
+            Log.d("CellularWorker",
+                    "timestamp: " + timestamp +
+                            " latitude: " + location.getLatitude() +
+                            " longitude: " + location.getLongitude() +
+                            " cellId: " + cellId +
+                            " rssi: " + rssi +
+                            " technology: " + technology +
+                            " frequency: " + frequency);
+        } else {
+            Log.e("CellularWorker", "Location is null");
+        }
     }
+
+
 
     // Enqueue work method
     public static void enqueueWork(Context context, Intent intent) {
@@ -196,3 +206,4 @@ public class CellularWorker extends Worker {
         androidx.work.WorkManager.getInstance(context).enqueue(workRequest);
     }
 }
+
