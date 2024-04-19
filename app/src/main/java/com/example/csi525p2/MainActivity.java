@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent intent = new Intent(this.getApplicationContext(), WifiBroadcast.class);
         pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 0, intent, 0);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), SCAN_INTERVAL, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), SCAN_INTERVAL, pendingIntent);
     }
 
     /**

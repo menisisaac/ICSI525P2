@@ -40,7 +40,7 @@ public class WifiBroadcast extends BroadcastReceiver {
             Log.d("Permissions Needed", "Wifi requires fine and coarse location");
             return;
         }
-        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         wifi.startScan();
         WifiDBHelper wifidb = new WifiDBHelper(context);
         SQLiteDatabase db = wifidb.getWritableDatabase();
