@@ -2,6 +2,7 @@ package com.example.csi525p2;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
@@ -39,7 +40,7 @@ public class CellularWorker extends Worker {
     private final TelephonyManager telephonyManager;
 
     // LocationManager instance to access location information
-    private final LocationManager locationManager;
+    private LocationManager locationManager;
 
     // Database helper instance for database operations
     private final CellularDBHelper dbHelper;
@@ -108,7 +109,6 @@ public class CellularWorker extends Worker {
                     int frequency = cellIdentity.getArfcn();
 
                     saveDataToDatabase(location, cellId, rssi, technology, frequency);
-//                    saveDataToDatabase(cellId, rssi, technology, frequency);
 
                 } else if (cellInfo instanceof CellInfoWcdma) {
                     // Retrieve WCDMA cell information and save to database
@@ -122,7 +122,6 @@ public class CellularWorker extends Worker {
                     int frequency = cellIdentity.getUarfcn();
 
                     saveDataToDatabase(location, cellId, rssi, technology, frequency);
-//                    saveDataToDatabase(cellId, rssi, technology, frequency);
 
                 } else if (cellInfo instanceof CellInfoLte) {
                     // Retrieve LTE cell information and save to database
@@ -136,7 +135,6 @@ public class CellularWorker extends Worker {
                     int frequency = cellIdentity.getEarfcn();
 
                     saveDataToDatabase(location, cellId, rssi, technology, frequency);
-//                    saveDataToDatabase(cellId, rssi, technology, frequency);
 
                 } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && cellInfo instanceof CellInfoNr) { // Handle NR cell info
                     // Retrieve NR cell information and save to database
@@ -150,7 +148,6 @@ public class CellularWorker extends Worker {
                     int frequency = cellIdentity.getNrarfcn();
 
                     saveDataToDatabase(location, cellId, rssi, technology, frequency);
-//                    saveDataToDatabase(cellId, rssi, technology, frequency);
                 }
             }
         }
@@ -191,19 +188,11 @@ public class CellularWorker extends Worker {
                         " frequency: " + frequency);
     }
 
-//    private void saveDataToDatabase(long cellId, int rssi, String technology, int frequency) {
-//        // Get writable database instance
-//        SQLiteDatabase db = dbHelper.getWritableDatabase();
-//
-//        // Insert data into the database table
-//        db.execSQL("INSERT INTO cellular_data (cell_id, rssi, technology, frequency) VALUES (?, ?, ?, ?)",
-//                new Object[]{cellId, rssi, technology, frequency});
-//
-//        // Log the inserted data for debugging or tracking purposes
-//        Log.d("CellularIntentService",
-//                        " cellId: " + cellId +
-//                        " rssi: " + rssi +
-//                        " technology: " + technology +
-//                        " frequency: " + frequency);
-//    }
+    // Enqueue work method
+    public static void enqueueWork(Context context, Intent intent) {
+        // Create WorkRequest
+        androidx.work.OneTimeWorkRequest workRequest = new androidx.work.OneTimeWorkRequest.Builder(CellularWorker.class).build();
+        // Enqueue work
+        androidx.work.WorkManager.getInstance(context).enqueue(workRequest);
+    }
 }

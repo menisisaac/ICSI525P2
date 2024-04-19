@@ -20,10 +20,13 @@ public class CellularBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.d("CellularAlarmReceiver", "Alarm received, starting service...");
 
-        // Create an intent to start the CellularIntentService
-        Intent serviceIntent = new Intent(context, CellularIntentService.class);
+//        // Create an intent to start the CellularIntentService
+//        Intent serviceIntent = new Intent(context, CellularIntentService.class);
+//
+//        // Start the CellularIntentService using the context
+//        context.startService(serviceIntent);
 
-        // Start the CellularIntentService using the context
-        context.startService(serviceIntent);
+        // Enqueue work using CellularWorker
+        CellularWorker.enqueueWork(context, intent);
     }
 }
