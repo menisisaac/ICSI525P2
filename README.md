@@ -1,19 +1,12 @@
-Targets correct android library and version using latest android studio 
+# Wireless Network Sniffer
+This app is design to collect geotagged data about the wifi and cellular technologies nearby
+## How to use 
+Place app on any android phone using Android Studio
+Use buttons to control what data is collected at any given time
+To extract data use the app inspection feature of android studio while the app is running and extract the database to a csv file
 
-Location:
-- https://developer.android.com/reference/android/location/Location.html
-- https://developer.android.com/develop/sensors-and-location/location/retrieve-current#java
-
-Data
-- https://developer.android.com/training/data-storage/sqlite
-
-Background 
-- https://developer.android.com/develop/background-work/background-tasks/broadcasts#kotlin
-- https://developer.android.com/reference/android/content/Intent
-- https://developer.android.com/develop/background-work/services/alarms/schedule
-
-- [ ] Wifi Data Collection
-- [ ] Cellular Data Collection
-- [ ] SQL lite connection
-- [ ] Location Collection
-- [ ] Button to start and stop 
+- [X] Wifi Data Collection
+- [X] Cellular Data Collection
+- [X] SQL lite connection
+- [X] Location Collection
+- [X] Button to start and stop 
