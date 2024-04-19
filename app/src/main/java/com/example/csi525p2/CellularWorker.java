@@ -40,7 +40,7 @@ public class CellularWorker extends Worker {
     private final TelephonyManager telephonyManager;
 
     // LocationManager instance to access location information
-    private LocationManager locationManager;
+    private final LocationManager locationManager;
 
     // Database helper instance for database operations
     private final CellularDBHelper dbHelper;
