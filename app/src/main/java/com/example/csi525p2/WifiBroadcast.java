@@ -28,32 +28,19 @@ public class WifiBroadcast extends BroadcastReceiver {
     }
 
     ;
-
+    /*
+    Uses WIFI & location service to collect geotagged 802.11 data
+    Adds data to the wifi table in a sqlite database
+     */
     protected void on(Context context) {
         Log.d("Event", "Intent Happened");
         WifiManager wifi = (WifiManager) context.getSystemService(WIFI_SERVICE);
         LocationManager lm = (LocationManager) context.getSystemService(LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+            Log.d("Permissions Needed", "Wifi requires fine and coarse location");
             return;
         }
         Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details;
-            return;
-        }
         wifi.startScan();
         WifiDBHelper wifidb = new WifiDBHelper(context);
         SQLiteDatabase db = wifidb.getWritableDatabase();

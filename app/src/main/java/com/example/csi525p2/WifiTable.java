@@ -5,6 +5,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
+/*
+SQLite specification for wifi, includes timestamp, longitude, latitude, and various radio specs
+ */
 public final class WifiTable {
     private WifiTable() {
     }
