@@ -7,7 +7,7 @@
         android:id="@+id/scanCellularTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cellular Scan"
+        android:text="@string/cellular_scan"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="150dp"/>
 
@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Start"
-        android:onClick="startCellularCollection"
+        android:onClick="startCellularIntentService"
         android:layout_below="@id/scanCellularTextView"
         android:layout_marginTop="20dp"
         android:layout_centerHorizontal="true"/>
@@ -35,7 +35,7 @@
         android:id="@+id/scanWifiTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Wifi Scan"
+        android:text="@string/wifi_scan"
         android:layout_below="@id/stopCellularButton"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="70dp"/>

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.csi525p2">
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -18,7 +20,6 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -29,11 +30,35 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CSI525P2"
         tools:targetApi="31">
-        <receiver android:name="WifiBroadcast"
-                  android:exported="false">
+
+
+<!--        <receiver android:name="WifiBroadcast"-->
+<!--                  android:exported="false">-->
+<!--        </receiver>-->
+<!--        <receiver android:name=".CellularBroadcastReceiver"-->
+<!--            android:exported="false">-->
+<!--        </receiver>-->
+
+        <!-- CellularIntentService -->
+        <service
+            android:name=".CellularIntentService"
+            android:exported="false" />
+
+        <!-- Broadcast receivers -->
+        <receiver android:name=".WifiBroadcast"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.net.wifi.SCAN_RESULTS" />
+            </intent-filter>
         </receiver>
-        <receiver android:name=".CellularAlarmReceiver"
-            android:exported="false"></receiver>
+        <receiver android:name=".CellularBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.example.csi525p2.START_CELLULAR_SERVICE" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Activities -->
         <activity
             android:name=".MainActivity"
             android:exported="true"

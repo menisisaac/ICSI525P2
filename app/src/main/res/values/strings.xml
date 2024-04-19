@@ -45,4 +45,6 @@
     </string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
+    <string name="cellular_scan">Cellular Scan</string>
+    <string name="wifi_scan">Wifi Scan</string>
 </resources>
