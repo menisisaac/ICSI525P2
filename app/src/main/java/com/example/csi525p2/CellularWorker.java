@@ -104,7 +104,7 @@ public class CellularWorker extends Worker {
                     @Override
                     public void onLocationResult(@NonNull LocationResult locationResult) {
                         if (locationResult.getLastLocation() != null) {
-                            Location location = locationResult.getLastLocation();
+//                            Location location = locationResult.getLastLocation();
 
                             // Check for permission to access fine location
                             if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -120,6 +120,7 @@ public class CellularWorker extends Worker {
                                         CellInfoGsm cellInfoGsm = (CellInfoGsm) cellInfo;
                                         CellIdentityGsm cellIdentity = cellInfoGsm.getCellIdentity();
                                         CellSignalStrengthGsm cellSignalStrength = cellInfoGsm.getCellSignalStrength();
+                                        Location location = locationResult.getLastLocation();
 
                                         long cellId = cellIdentity.getCid();
                                         int rssi = cellSignalStrength.getDbm();
@@ -133,6 +134,7 @@ public class CellularWorker extends Worker {
                                         CellInfoWcdma cellInfoWcdma = (CellInfoWcdma) cellInfo;
                                         CellIdentityWcdma cellIdentity = cellInfoWcdma.getCellIdentity();
                                         CellSignalStrengthWcdma cellSignalStrength = cellInfoWcdma.getCellSignalStrength();
+                                        Location location = locationResult.getLastLocation();
 
                                         long cellId = cellIdentity.getCid();
                                         int rssi = cellSignalStrength.getDbm();
@@ -146,6 +148,7 @@ public class CellularWorker extends Worker {
                                         CellInfoLte cellInfoLte = (CellInfoLte) cellInfo;
                                         CellIdentityLte cellIdentity = cellInfoLte.getCellIdentity();
                                         CellSignalStrengthLte cellSignalStrength = cellInfoLte.getCellSignalStrength();
+                                        Location location = locationResult.getLastLocation();
 
                                         long cellId = cellIdentity.getCi();
                                         int rssi = cellSignalStrength.getDbm();
@@ -159,6 +162,7 @@ public class CellularWorker extends Worker {
                                         CellInfoNr cellInfoNr = (CellInfoNr) cellInfo;
                                         CellIdentityNr cellIdentity = (CellIdentityNr) cellInfoNr.getCellIdentity();
                                         CellSignalStrengthNr cellSignalStrength = (CellSignalStrengthNr) cellInfoNr.getCellSignalStrength();
+                                        Location location = locationResult.getLastLocation();
 
                                         long cellId = cellIdentity.getNci();
                                         int rssi = cellSignalStrength.getDbm();
